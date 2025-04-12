@@ -1,8 +1,0 @@
-2025-03-29 17:40:08 error: uncaughtException: listen EACCES: permission denied 0.0.0.0:3005
-Error: listen EACCES: permission denied 0.0.0.0:3005
-    at Server.setupListenHandle [as _listen2] (node:net:1881:21)
-    at listenInCluster (node:net:1946:12)
-    at Server.listen (node:net:2044:7)
-    at App.listen (C:\Users\alexa\CodeVStudio\starter\template\server\src\server\config.ts:53:17)
-    at start (C:\Users\alexa\CodeVStudio\starter\template\server\src\server\index.ts:5:7)
-    at processTicksAndRejections (node:internal/process/task_queues:95:5)

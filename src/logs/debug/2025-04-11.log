@@ -1,6 +1,0 @@
-2025-04-11 19:49:01 info: ======= Version: development =======
-          🚀 server listening port: 3005 🚀
-2025-04-11 19:50:24 info: [0mGET /api/test/params/5 [32m200[0m 5.522 ms - 20[0m
-2025-04-11 19:50:48 info: [0mGET /api/test/params/5 [32m200[0m 0.956 ms - 20[0m
-2025-04-11 19:51:12 info: [0mGET /api/test/params/5 [32m200[0m 0.486 ms - 20[0m
-2025-04-11 19:53:09 info: [0mGET /api/test/params/5 [32m200[0m 0.596 ms - 20[0m
