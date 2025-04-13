@@ -6,6 +6,7 @@ import type { ctx } from '@interfaces/middlewares';
 import { createHmac } from 'crypto';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
+import { stringify } from 'uuid';
 
 const { COOKIE_NAME } = env;
 const getAuthorization = (req: Request) => {
@@ -19,7 +20,9 @@ const getAuthorization = (req: Request) => {
 const computedSignature = (req: Request) => {
   const signature = req.header('Signature');
   if (!signature) throw new InvalidArgumentError('Signature value is required');
-  return [createHmac('sha256', env.SIGNATURE).update(signature).digest('hex'), signature];
+  const buffedSign = new Uint8Array(Buffer.from(signature, 'base64'));
+  const sign = stringify(buffedSign);
+  return [createHmac('sha256', env.SIGNATURE).update(sign).digest('hex'), signature];
 };
 
 const mw =
@@ -94,7 +97,8 @@ const mw =
       const [xSignature, signature] = computedSignature(req);
       ctx.res.setHeader('X-Signature', xSignature);
       ctx.res.setHeader('Signature', signature);
-
+      const xTag = req.header('x-Tag');
+      if (xTag) ctx.res.setHeader('x-Tag', xTag);
       await ctx.next();
     } catch (err) {
       console.log(err);

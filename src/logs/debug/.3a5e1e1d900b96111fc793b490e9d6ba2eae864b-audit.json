@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": false,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\debug\\.3a5e1e1d900b96111fc793b490e9d6ba2eae864b-audit.json",
+    "files": [
+        {
+            "date": 1744566673605,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\debug\\2025-04-13.log",
+            "hash": "8f3a786418176b6a6fc131f0af612b3c8d24c567fdbe8f42da655b3ef38e1446"
+        },
+        {
+            "date": 1744581663540,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\debug\\2025-04-14.log",
+            "hash": "c2621a2754fe3275ddcc3b4b633f9c92f58fcc67bbebec878d1378d2d42827e2"
+        }
+    ],
+    "hashType": "sha256"
+}

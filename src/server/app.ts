@@ -60,7 +60,7 @@ export default class App extends ApiRouter {
         origin: ORIGIN,
         credentials: true,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        allowedHeaders: 'Content-Type,Authorization,Signature',
+        allowedHeaders: 'Content-Type,Authorization,Signature,x-Tag',
       }),
     );
     this.app.use(hpp());
@@ -75,7 +75,7 @@ export default class App extends ApiRouter {
         origin: ORIGIN,
         credentials: true,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        allowedHeaders: 'Content-Type,Authorization,Signature',
+        allowedHeaders: 'Content-Type,Authorization,Signature,x-Tag',
       }),
     );
   }
@@ -94,7 +94,7 @@ export default class App extends ApiRouter {
 
   private initializeStoredLibs() {
     // MemoryServerCache;
-    // socket.getInstance(this.io);
+    socket.getInstance(this.io);
   }
 
   private initializeAppRoutes() {
@@ -115,3 +115,5 @@ export default class App extends ApiRouter {
     });
   }
 }
+
+// '5f50cff4-f3c8-4756-9642-39d566d249eb'
