@@ -16,4 +16,6 @@ const dbConfig = {
 // P = 5432
 // D = trading
 
+// Dbeaver
+
 export default dbConfig;
