@@ -1,40 +1,16 @@
 import { type ctx, type LocalsCTX } from './middlewares';
 
-export type ExpressHandler<T extends LocalsCTX = LocalsCTX> = (ctx: ctx<T>) => Promise<void>;
-export type ControllerMethods<T> = {
-  [K in keyof T]: ExpressHandler;
-};
+export type Handler<T, K extends keyof T> = T[K];
+export namespace Controller {
+  export interface ControllerWithParams<T extends string | object> {
+    params: T extends 'id' ? { id: number } : T extends string ? { [key in T]: string } : T;
+  }
 
-export interface ControllerWithParams<T extends string | object> {
-  params: T extends 'id' ? { id: number } : T extends string ? { [key in T]: string } : T;
-}
-
-export type cookiesValues<T extends object> = T & {
-  expired?: boolean;
-};
-
-export interface ControllerWithCookie<T extends object> {
-  cookie: cookiesValues<T>;
-}
-
-export interface IsolatedMethod {
-  body: {
-    symbols: string[];
-    balance: number;
-    weekPeriod: number;
-    leverage: number;
+  type cookiesValues<T extends object> = {
+    [K in keyof T]: T[K] & { expired?: boolean };
   };
-}
 
-export interface RepayMethod {
-  body: {
-    symbol: string;
-    amount: number;
-  };
-}
+  type MergeCookie<T> = T extends { cookie: infer C extends object } ? Omit<T, 'cookie'> & { cookie: cookiesValues<C> } : T;
 
-export interface assetMethod {
-  params?: {
-    asset?: string;
-  };
+  type methodsHandler<T extends LocalsCTX> = ctx<MergeCookie<T>>;
 }

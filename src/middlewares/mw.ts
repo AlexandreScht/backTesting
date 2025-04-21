@@ -7,6 +7,7 @@ import { createHmac } from 'crypto';
 import deepmerge from 'deepmerge';
 import type { NextFunction, Request, Response } from 'express';
 import { stringify } from 'uuid';
+import { rateLimit } from './rateLimiter';
 
 const { COOKIE_NAME } = env;
 const getAuthorization = (req: Request) => {
@@ -28,12 +29,14 @@ const computedSignature = (req: Request) => {
 const mw =
   (middlewaresHandler: any[]) =>
   async (req: Request, res: Response, nextExpress: NextFunction): Promise<void> => {
+    await rateLimit().catch(() => nextExpress(new Error('The server is busy. Please try again later.')));
     if (!middlewaresHandler || middlewaresHandler.length === 0) {
       return nextExpress();
     }
 
     const locals = {};
     const onErrors = [];
+    const onSuccess = [];
     const session: Partial<Session.TokenUser> = {};
     let handlerIndex = 0;
     const ctx: ctx = {
@@ -51,6 +54,18 @@ const mw =
       set onError(newAction) {
         Object.assign(onErrors, deepmerge(onErrors, newAction));
       },
+      get onSuccess() {
+        return onSuccess;
+      },
+      set onSuccess(newAction) {
+        Object.assign(onSuccess, deepmerge(onSuccess, newAction));
+      },
+      get onComplete() {
+        return onSuccess;
+      },
+      set onComplete(newAction) {
+        Object.assign(onSuccess, deepmerge(onSuccess, newAction));
+      },
       get session() {
         return session;
       },
@@ -60,10 +75,7 @@ const mw =
       next: async err => {
         try {
           if (err && err instanceof Error) {
-            if (ctx.onError.length) {
-              await Promise.all(ctx.onError.map(fn => fn()));
-            }
-            return nextExpress(err);
+            throw err;
           }
 
           const handler = middlewaresHandler[handlerIndex];
@@ -71,13 +83,16 @@ const mw =
 
           if (typeof handler === 'function') {
             await handler(ctx);
+            if (handlerIndex === middlewaresHandler.length) {
+              if (ctx.onSuccess?.length) await Promise.all(ctx.onSuccess.map(fn => fn()));
+              if (ctx.onComplete?.length) await Promise.all(ctx.onComplete.map(fn => fn()));
+            }
           } else {
             return nextExpress(new Error('Handler is not a function'));
           }
         } catch (error) {
-          if (ctx.onError.length) {
-            await Promise.all(ctx.onError.map(fn => fn()));
-          }
+          if (ctx.onError?.length) await Promise.all(ctx.onError.map(fn => fn()));
+          if (ctx.onComplete?.length) await Promise.all(ctx.onComplete.map(fn => fn()));
           return nextExpress(error);
         }
       },
@@ -101,8 +116,6 @@ const mw =
       if (xTag) ctx.res.setHeader('x-Tag', xTag);
       await ctx.next();
     } catch (err) {
-      console.log(err);
-
       return nextExpress(err);
     }
   };

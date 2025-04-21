@@ -1,5 +1,5 @@
 import logsConfig from '@/config/logs';
-import chalk from 'chalk'; // Importez chalk pour la coloration de la console
+import chalk from 'chalk';
 import { existsSync, mkdirSync } from 'fs';
 import moment from 'moment-timezone';
 import { join } from 'path';

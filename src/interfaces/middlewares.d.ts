@@ -1,4 +1,4 @@
-import type { TokenUser } from '@interfaces/session';
+import type { Session } from '@/interfaces/session';
 import type { Request, Response } from 'express';
 import type { z, ZodNumber, ZodOptional, ZodString } from 'zod';
 export type LocalsCTX =
@@ -7,7 +7,7 @@ export type LocalsCTX =
       params: Record<string, unknown>;
       query: Record<string, unknown>;
       cookie: Record<string, unknown>;
-      key: string;
+      token: string;
     }
   | Record<string, any>;
 
@@ -16,7 +16,9 @@ export interface ctx<T extends LocalsCTX = LocalsCTX> {
   res: Response;
   locals: T;
   onError: (() => Promise<void> | void)[];
-  session?: Partial<TokenUser>;
+  onSuccess: (() => Promise<void> | void)[];
+  onComplete: (() => Promise<void> | void)[];
+  session?: Partial<Session.TokenUser>;
   next: (err?: unknown) => Promise<void>;
 }
 
@@ -25,4 +27,11 @@ export interface validators {
   params?: z.ZodSchema<any>;
   query?: z.ZodSchema<any>;
   token?: ZodString | ZodNumber | ZodOptional<ZodString> | ZodOptional<ZodNumber>;
+}
+
+export interface slowDown {
+  onError?: number;
+  onSuccess?: number;
+  onExecute?: number;
+  onComplete?: number;
 }

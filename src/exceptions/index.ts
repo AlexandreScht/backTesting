@@ -22,9 +22,9 @@ export class InvalidArgumentError extends ServerException {
   }
 }
 
-export class InsufficientFundError extends ServerException {
-  constructor(message: string | string[] = 'Insufficient funds, deposit required on the spot account') {
-    super(500, message);
+export class InvalidRoleAccessError extends ServerException {
+  constructor(message: string[] | string = 'Access denied. You don’t have permission to access this resource') {
+    super(605, message);
   }
 }
 
@@ -49,5 +49,11 @@ export class ExpiredSessionError extends ServerException {
 export class InvalidAccessError extends ServerException {
   constructor(message: string | string[] = 'Access denied') {
     super(403, message);
+  }
+}
+
+export class ServicesError extends ServerException {
+  constructor(message: string[] | string = 'The service encountered an unexpected error. Please try again later.') {
+    super(505, message);
   }
 }

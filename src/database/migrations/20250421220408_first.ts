@@ -1,0 +1,21 @@
+import { type Kysely, sql } from 'kysely';
+
+export async function up(db: Kysely<any>): Promise<void> {
+  await db.schema.createType('user_role').asEnum(['admin', 'premium', 'member']).execute();
+
+  await db.schema
+    .createTable('users')
+    .addColumn('id', 'serial', col => col.primaryKey())
+    .addColumn('email', 'serial', col => col.primaryKey().unique())
+    .addColumn('firstName', 'varchar', col => col.notNull())
+    .addColumn('lastName', 'varchar', col => col.notNull())
+    .addColumn('role', sql`user_role`, col => col.notNull().defaultTo('member'))
+    .addColumn('updated_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
+    .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
+    .execute();
+}
+
+export async function down(db: Kysely<any>): Promise<void> {
+  await db.schema.dropTable('users').execute();
+  await db.schema.dropType('user_role').execute();
+}

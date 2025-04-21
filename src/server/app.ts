@@ -1,4 +1,5 @@
 import logsConfig from '@/config/logs';
+import dbInstance from '@/database/pg';
 import { type WebSocket } from '@/interfaces/websocket';
 import socket from '@/libs/socket';
 import env from '@config';
@@ -37,6 +38,7 @@ export default class App extends ApiRouter {
   }
 
   public async initialize() {
+    await this.connectToDatabase();
     this.initializeStoredLibs();
     this.initializeMiddlewares();
     this.initializeAppRoutes();
@@ -50,6 +52,10 @@ export default class App extends ApiRouter {
           🚀 server listening port: ${this.port} 🚀`);
     });
     return this.server;
+  }
+
+  private async connectToDatabase() {
+    await dbInstance.dbConnection();
   }
 
   private initializeMiddlewares() {
@@ -82,8 +88,6 @@ export default class App extends ApiRouter {
 
   private initializeBodyContent() {
     this.app.use((req: Request, res: Response, next: NextFunction) => {
-      //  for stripe webhook
-      //! modify for /api/webhooks/stripe
       if (req.url === '/api/stripe_webhook') {
         express.raw({ type: 'application/json' })(req, res, next);
       } else {
@@ -115,5 +119,3 @@ export default class App extends ApiRouter {
     });
   }
 }
-
-// '5f50cff4-f3c8-4756-9642-39d566d249eb'

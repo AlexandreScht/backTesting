@@ -1,27 +1,40 @@
-const fs = require('fs');
+// scripts/reset.js
+import fs from 'fs';
+import path from 'path';
 
-const removeDirRoute = 'dist';
+// Récupère les arguments passés après "npm run reset"
+const args = process.argv.slice(2);
+const cleanLogs = args.includes('l');
 
-try {
-  if (fs.existsSync(removeDirRoute)) {
-    fs.rm(removeDirRoute, { recursive: true }, (error: unknown | null) => {
-      if (error) {
-        if (error instanceof Error) {
-          console.error('❌ Error during reset:', error.message);
-        } else {
-          console.error('❌ Error during reset:', 'Unknown error');
-        }
-      } else {
-        console.log('✅ Reset successful');
-      }
-    });
-  } else {
-    console.log('❌ The directory does not exist');
-  }
-} catch (error) {
-  if (error instanceof Error) {
-    console.error('❌ Error during reset:', error.message);
-  } else {
-    console.error('❌ Error during reset:', 'Unknown error');
+async function deleteFilesInDir(dirPath) {
+  try {
+    const files = await fs.promises.readdir(dirPath);
+    await Promise.all(files.map(file => fs.promises.unlink(path.join(dirPath, file))));
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      console.error(`✖ Erreur lors de la suppression dans ${dirPath}:`, err);
+    }
   }
 }
+
+async function reset() {
+  console.debug('🔄 Démarrage de la réinitialisation…');
+
+  if (cleanLogs) {
+    console.debug('🧹 Nettoyage des logs activé (-- l détecté) ');
+    const logDirs = [path.resolve(__dirname, '../logs/debug'), path.resolve(__dirname, '../logs/error'), path.resolve(__dirname, '../logs/warn')];
+
+    for (const dir of logDirs) {
+      await deleteFilesInDir(dir);
+    }
+  } else {
+    console.debug('⚠️  Nettoyage des logs désactivé (pas de -- l)');
+  }
+
+  console.debug('✅ Réinitialisation terminée.');
+}
+
+reset().catch(err => {
+  console.error('❌ Échec de la réinitialisation :', err);
+  process.exit(1);
+});

@@ -6,9 +6,14 @@
     "auditLog": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\warn\\.81a4ebe20001fda8486890f2bb5ce19bb0697e57-audit.json",
     "files": [
         {
-            "date": 1744566673628,
-            "name": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\warn\\2025-04-13.log",
-            "hash": "7a209d15434b2e79bdb96ac7745e06d6a02d81a8ab7b66ac538b123affba6a88"
+            "date": 1745148106492,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\warn\\2025-04-20.log",
+            "hash": "11361958c95ab501a3dd06299ddc738c4b85a74cfd50f1bb683801695712b09f"
+        },
+        {
+            "date": 1745237231901,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\warn\\2025-04-21.log",
+            "hash": "7c1ce273cde359652e83bdcef88c56fe6e5fc285fa9e8832e9036db582830127"
         }
     ],
     "hashType": "sha256"

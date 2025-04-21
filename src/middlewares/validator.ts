@@ -1,5 +1,5 @@
 import { InvalidArgumentError, ServerException } from '@/exceptions';
-import { ctx, validators } from '@interfaces/middlewares';
+import { type ctx, type validators } from '@interfaces/middlewares';
 import type { Request } from 'express';
 import { z, ZodError, ZodObject } from 'zod';
 

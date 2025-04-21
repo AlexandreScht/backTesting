@@ -26,12 +26,19 @@ export default [
       '@typescript-eslint': tsPlugin,
       prettier: prettierPlugin,
     },
+    extends: ['plugin:prettier/recommended'],
 
     rules: {
       ...js.configs.recommended.rules,
       ...tsPlugin.configs.recommended.rules,
       ...prettierPlugin.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'warn',
+      'no-console': [
+        'warn',
+        {
+          allow: ['warn', 'error', 'debug'],
+        },
+      ],
       '@typescript-eslint/consistent-type-imports': [
         'warn',
         {
@@ -40,14 +47,13 @@ export default [
           fixStyle: 'inline-type-imports',
         },
       ],
-      // '@typescript-eslint/explicit-member-accessibility': 0,
-      // '@typescript-eslint/explicit-function-return-type': 0,
-      // '@typescript-eslint/no-parameter-properties': 0,
-      // '@typescript-eslint/interface-name-prefix': 0,
-      // '@typescript-eslint/explicit-module-boundary-types': 0,
-      // '@typescript-eslint/no-explicit-any': 'off',
-      // '@typescript-eslint/ban-types': 'off',
-      // '@typescript-eslint/no-var-requires': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          caughtErrors: 'none',
+        },
+      ],
+      'prettier/prettier': ['error', { endOfLine: 'lf' }],
     },
   },
 ];

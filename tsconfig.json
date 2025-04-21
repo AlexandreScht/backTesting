@@ -35,6 +35,6 @@
       "@utils/*": ["utils/*"]
     }
   },
-  "include": ["./src/**/*.ts", "./src/**/*.json", ".env", "src/utils/regionLoc.ts", "src/types/global.d.ts", "knexfile.ts"],
+  "include": ["./src/**/*.ts", "./src/**/*.json", ".env", "src/utils/regionLoc.ts", "src/types/global.d.ts", "knexfile.ts", "src/validators"],
   "exclude": ["node_modules", "src/logs"]
 }

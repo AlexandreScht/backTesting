@@ -1,6 +1,6 @@
 import { decryptSessionApiKey } from '@/utils/token';
 import { InvalidArgumentError, NotFoundError, ServerException } from '@exceptions';
-import { ctx } from '@interfaces/middlewares';
+import { type ctx } from '@interfaces/middlewares';
 import { TokenExpiredError } from 'jsonwebtoken';
 
 const cookies = ({ names, onlySigned = true, acceptError = false }: { names: string | string[]; onlySigned?: boolean; acceptError?: boolean }) => {
