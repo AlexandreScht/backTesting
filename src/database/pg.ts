@@ -1,6 +1,5 @@
 import dbConfig from '@/config/db';
-import { Database } from '@/interfaces/database';
-import DatabaseShape from '@/src/types/Database';
+import type DatabaseShape from '@/types/models/Database';
 import { logger } from '@/utils/logger';
 import { PostgresDialect, sql } from 'kysely';
 import { Database as DatabaseOrm } from 'kysely-orm';
@@ -31,7 +30,7 @@ class dbConnection {
     }
   }
 
-  public BaseModel<TableName extends keyof Database.tableList & string, IdColumn extends keyof Database.tableList[TableName] & string>(
+  public BaseModel<TableName extends keyof DatabaseShape & string, IdColumn extends keyof DatabaseShape[TableName] & string>(
     tableName: TableName,
     idColumn: IdColumn,
   ) {

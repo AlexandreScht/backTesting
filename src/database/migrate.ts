@@ -3,7 +3,7 @@
 import chalk from 'chalk';
 import { promises as fs } from 'fs';
 import { processDatabase } from 'kanel';
-import { makeKyselyHook } from 'kanel-kysely';
+import { kyselyTypeFilter, makeKyselyHook } from 'kanel-kysely';
 import { FileMigrationProvider, Kysely, Migrator, PostgresDialect } from 'kysely';
 import path from 'path';
 import { Pool } from 'pg';
@@ -89,6 +89,7 @@ export async function migrate(rollBack?: boolean) {
         preDeleteOutputFolder: true,
         schemas: ['public'],
         outputPath: path.resolve(__dirname, '../types/models'),
+        typeFilter: kyselyTypeFilter,
         preRenderHooks: [makeKyselyHook()],
       });
       process.stdout.write = originalStdout;

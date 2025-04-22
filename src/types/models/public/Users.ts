@@ -11,7 +11,9 @@ export type UsersId = number & { __brand: 'public.users' };
 export default interface UsersTable {
   id: ColumnType<UsersId, UsersId | undefined, UsersId>;
 
-  email: ColumnType<number, number | undefined, number>;
+  email: ColumnType<string, string, string>;
+
+  password: ColumnType<string | null, string | null, string | null>;
 
   firstName: ColumnType<string, string, string>;
 
@@ -20,6 +22,14 @@ export default interface UsersTable {
   role: ColumnType<UserRole, UserRole | undefined, UserRole>;
 
   phone: ColumnType<string | null, string | null, string | null>;
+
+  validate: ColumnType<boolean, boolean | undefined, boolean>;
+
+  accessToken: ColumnType<string | null, string | null, string | null>;
+
+  stripeCustomerId: ColumnType<string | null, string | null, string | null>;
+
+  isSubscribed: ColumnType<boolean, boolean | undefined, boolean>;
 
   updated_at: ColumnType<Date, Date | string | undefined, Date | string>;
 

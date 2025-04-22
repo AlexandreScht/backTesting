@@ -75,17 +75,18 @@ async function processFile(originalPath: string, originalContent: string, isFirs
   } catch (error) {
     clearMigrationCache(path.resolve(__dirname, 'migrations'));
     if (isFirst) return processFile(originalPath, originalContent, isFirst, tmpPath);
-    await writeFile(originalPath, originalContent, 'utf-8');
-    console.debug(chalk.yellow('↩️ Réstauration de la migration'));
-    const originalDebug = console.debug;
-    console.debug = () => {};
     try {
+      await writeFile(originalPath, originalContent, 'utf-8');
+      console.debug(chalk.yellow('↩️ Réstauration de la migration'));
+      const originalDebug = console.debug;
+      console.debug = () => {};
       await migrate();
       console.debug = originalDebug;
       console.debug(chalk.green('↩✅ Migration restaurée'));
       clearMigrationCache(path.resolve(__dirname, 'migrations'));
       return processFile(originalPath, originalContent, isFirst, tmpPath);
     } catch (error) {
+      console.error(error);
       console.debug(chalk.redBright('⛔️⛔️ Fichier Corrompu ⛔️⛔️'));
       process.exit(1);
     }
