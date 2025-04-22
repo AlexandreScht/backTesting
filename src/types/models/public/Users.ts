@@ -19,6 +19,8 @@ export default interface UsersTable {
 
   role: ColumnType<UserRole, UserRole | undefined, UserRole>;
 
+  phone: ColumnType<string | null, string | null, string | null>;
+
   updated_at: ColumnType<Date, Date | string | undefined, Date | string>;
 
   created_at: ColumnType<Date, Date | string | undefined, Date | string>;
