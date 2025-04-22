@@ -21,8 +21,8 @@ const env = cleanEnv(process.env, {
   REDIS_HOST: str({ default: '127.0.0.1' }),
   REDIS_PORT: port({ default: 6379 }),
   //* GOOGLE
-  CAPTCHA_SECRET_KEY: str(),
-  GOOGLE_CLIENT_ID: str(),
+  // CAPTCHA_SECRET_KEY: str(),
+  // GOOGLE_CLIENT_ID: str(),
   //* DATABASE
   DB_USER: str(),
   DB_PASSWORD: str(),

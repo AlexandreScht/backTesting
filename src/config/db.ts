@@ -10,12 +10,4 @@ const dbConfig = {
   port: Number(env.DB_PORT),
 };
 
-// U = postgres
-// P = SinchouEDeaira8!
-// H = localhost
-// P = 5432
-// D = trading
-
-// Dbeaver
-
 export default dbConfig;

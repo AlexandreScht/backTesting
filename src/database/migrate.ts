@@ -1,7 +1,5 @@
 #!/usr/bin/env ts-node
 
-import dbConfig from '@/config/db';
-import Database from '@/types/models/Database';
 import chalk from 'chalk';
 import { promises as fs } from 'fs';
 import { processDatabase } from 'kanel';
@@ -9,6 +7,23 @@ import { makeKyselyHook } from 'kanel-kysely';
 import { FileMigrationProvider, Kysely, Migrator, PostgresDialect } from 'kysely';
 import path from 'path';
 import { Pool } from 'pg';
+import { Writable } from 'stream';
+import dbConfig from '../../src/config/db';
+import type Database from '../../src/types/models/Database';
+
+const bindOutput = () => {
+  const devnull = new Writable({
+    write(chunk, enc, cb) {
+      cb();
+    },
+  });
+  const originalStdout = process.stdout.write;
+  const originalStderr = process.stderr.write;
+  process.stdout.write = devnull.write.bind(devnull);
+  process.stderr.write = devnull.write.bind(devnull);
+
+  return { originalStdout, originalStderr };
+};
 
 export async function migrate(rollBack?: boolean) {
   // 1️⃣ Connexion DB
@@ -28,63 +43,64 @@ export async function migrate(rollBack?: boolean) {
 
   if (rollBack) {
     try {
-      console.log(chalk.yellow('🡆 Début du rollback'));
+      console.debug(chalk.yellow('🡆 Début du rollback'));
       const { error, results } = await migrator.migrateDown();
-      const [{ migrationName, status }] = results || [];
 
+      if (!results || !results?.length) {
+        console.debug(chalk.cyan('ℹ️ aucun rollback à effectuer.'));
+        return;
+      }
+
+      const [{ migrationName, status }] = results || [];
       if (error) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error(chalk.red(`❌ ${migrationName} rollback => ${msg}`));
         throw new Error();
-      } else if (!results || !results?.length) {
-        console.log(chalk.cyan('ℹ️ aucun rollback à effectuer.'));
-        return;
-      } else {
-        console.log(chalk.green('✅ Rollback appliqué sur :'));
-        console.log(`   • ${chalk.magenta(migrationName)} → ${chalk.green(status)}`);
-        return;
       }
-    } catch (error) {
-      //   TypeError: Cannot read properties of undefined (reading 'migrationName')
-      // at migrate (C:\Users\alexa\CodeVStudio\backTesting\server\src\database\migrate.ts:33:16)
-      // at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-      // at processFile (C:\Users\alexa\CodeVStudio\backTesting\server\src\database\migrate.conf.ts:62:5)
-      // at main (C:\Users\alexa\CodeVStudio\backTesting\server\src\database\migrate.conf.ts:104:3)
 
-      //! pareille pour le migrate
-      console.log(error);
+      console.debug(chalk.green('✅ Rollback appliqué sur :'));
+      console.debug(`   • ${chalk.magenta(migrationName)} → ${chalk.green(status)}`);
+      return;
+    } catch (error) {
+      console.debug(error);
     }
   } else {
-    console.log(chalk.yellow('🡆 Début de la migration'));
+    console.debug(chalk.yellow('🡆 Début de la migration'));
     const { error, results } = await migrator.migrateUp();
+    if (!results || !results?.length) {
+      console.debug(chalk.cyan('ℹ️ aucune migration à appliquer.'));
+      return;
+    }
     const [{ migrationName, status }] = results || [];
 
     if (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error(chalk.red(`❌ ${migrationName} migration => ${msg}`));
       throw new Error();
-    } else if (!results || !results?.length) {
-      console.log(chalk.cyan('ℹ️ aucune migration à appliquer.'));
+    }
+    console.debug(chalk.green('✅ Migrations appliquées :'));
+    console.debug(`   • ${chalk.magenta(migrationName)} → ${chalk.green(status)}`);
+    console.debug(chalk.yellow('🡆 Génération du typage de la database'));
+    const { originalStdout, originalStderr } = bindOutput();
+    try {
+      await processDatabase({
+        enumStyle: 'type',
+        connection: dbConfig,
+        preDeleteOutputFolder: true,
+        schemas: ['public'],
+        outputPath: path.resolve(__dirname, '../types/models'),
+        preRenderHooks: [makeKyselyHook()],
+      });
+      process.stdout.write = originalStdout;
+      process.stderr.write = originalStderr;
+      console.debug(chalk.green('✅ Types générés avec succès.'));
       return;
-    } else {
-      console.log(chalk.green('✅ Migrations appliquées :'));
-      console.log(`   • ${chalk.magenta(migrationName)} → ${chalk.green(status)}`);
-      console.log(chalk.yellow('🡆 Génération des types Kysely via Kanel…'));
-      try {
-        await processDatabase({
-          connection: dbConfig,
-          preDeleteOutputFolder: true,
-          schemas: ['public'],
-          outputPath: path.resolve(__dirname, '../src/types/models'),
-          preRenderHooks: [makeKyselyHook()],
-        });
-        console.log(chalk.green('✅ Types générés avec succès.'));
-        return;
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        console.error(chalk.red(`❌ Échec de la génération des types : ${msg}`));
-        throw new Error();
-      }
+    } catch (e) {
+      process.stdout.write = originalStdout;
+      process.stderr.write = originalStderr;
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(chalk.red(`❌ Échec de la génération des types : ${msg}`));
+      throw new Error();
     }
   }
 }

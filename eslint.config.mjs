@@ -8,37 +8,22 @@ import globals from 'globals';
 export default [
   {
     files: ['src/**/*.{js,mjs,cjs,ts}'],
-    ignores: ['node_modules', 'dist', 'src/logs', 'src/commands'],
-
+    ignores: ['.vscode/**', 'node_modules/**', 'dist/**', 'src/types/models/**'],
     languageOptions: {
       parser: tsParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-      globals: {
-        ...globals.node,
-        ...globals.browser,
-      },
+      parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+      globals: { ...globals.node, ...globals.browser },
     },
-
     plugins: {
       '@typescript-eslint': tsPlugin,
       prettier: prettierPlugin,
     },
-    extends: ['plugin:prettier/recommended'],
-
     rules: {
       ...js.configs.recommended.rules,
       ...tsPlugin.configs.recommended.rules,
       ...prettierPlugin.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'warn',
-      'no-console': [
-        'warn',
-        {
-          allow: ['warn', 'error', 'debug'],
-        },
-      ],
+      'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
       '@typescript-eslint/consistent-type-imports': [
         'warn',
         {
@@ -47,12 +32,7 @@ export default [
           fixStyle: 'inline-type-imports',
         },
       ],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          caughtErrors: 'none',
-        },
-      ],
+      '@typescript-eslint/no-unused-vars': ['error', { caughtErrors: 'none' }],
       'prettier/prettier': ['error', { endOfLine: 'lf' }],
     },
   },

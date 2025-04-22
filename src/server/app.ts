@@ -1,7 +1,7 @@
 import logsConfig from '@/config/logs';
 import dbInstance from '@/database/pg';
 import { type WebSocket } from '@/interfaces/websocket';
-import socket from '@/libs/socket';
+// import socket from '@/libs/socket';
 import env from '@config';
 import { ErrorMiddleware } from '@middlewares/error';
 import ApiRouter from '@routes/index';
@@ -98,7 +98,7 @@ export default class App extends ApiRouter {
 
   private initializeStoredLibs() {
     // MemoryServerCache;
-    socket.getInstance(this.io);
+    // socket.getInstance(this.io);
   }
 
   private initializeAppRoutes() {
