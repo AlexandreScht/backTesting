@@ -30,6 +30,10 @@ class dbConnection {
     }
   }
 
+  get getDb() {
+    return this.db.db;
+  }
+
   public BaseModel<TableName extends keyof DatabaseShape & string, IdColumn extends keyof DatabaseShape[TableName] & string>(
     tableName: TableName,
     idColumn: IdColumn,

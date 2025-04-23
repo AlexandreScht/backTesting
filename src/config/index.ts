@@ -29,6 +29,13 @@ const env = cleanEnv(process.env, {
   DB_HOST: str({ default: 'localhost' }),
   DB_PORT: port({ default: 5432 }),
   DB_DATABASE: str(),
+  //* MAILER
+  MAILER_HOST: str(),
+  MAILER_PORT: port({ default: 587 }),
+  MAILER_USER: str(),
+  MAILER_PASSWORD: str(),
+  MAILER_FROM: str({ default: 'no-reply@gmail.com' }),
+  MAILER_SUPPORT: str({ default: 'supprt-company@gmail.com' }),
 });
 
 export default env;
