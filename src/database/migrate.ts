@@ -91,6 +91,31 @@ export async function migrate(rollBack?: boolean) {
         outputPath: path.resolve(__dirname, '../types/models'),
         typeFilter: kyselyTypeFilter,
         preRenderHooks: [makeKyselyHook()],
+        postRenderHooks: [
+          (filePath, lines) => {
+            if (!filePath.endsWith('.ts')) return lines;
+
+            return lines
+              .filter(line => !/import\s+type\s+\{[^}]*\b(ColumnType|Selectable|Insertable|Updateable)\b[^}]*\}\s+from\s+['"]kysely['"]/.test(line))
+              .map(line => {
+                if (/^export\s+type\s+\w+Id\s*=/.test(line)) {
+                  return line.replace(/^export\s+type\s+(\w+Id)\s*=\s*([^&]+)&\s*\{\s*__brand:[^}]+\};$/, 'export type $1 = $2;');
+                }
+
+                if (/:?\s*ColumnType</.test(line)) {
+                  return line.replace(/ColumnType<\s*([^,>]+)[^>]*>/g, '$1');
+                }
+
+                if (/^export\s+type\s+\w+\s*=\s*(Selectable|Insertable|Updateable)<.*>;$/.test(line)) {
+                  return '';
+                }
+
+                return line;
+              })
+
+              .filter(line => line.trim() !== '');
+          },
+        ],
       });
       process.stdout.write = originalStdout;
       process.stderr.write = originalStderr;

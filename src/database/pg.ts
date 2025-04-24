@@ -1,18 +1,18 @@
 import dbConfig from '@/config/db';
-import { type Database } from '@/interfaces/database';
 import { AppDatabase } from '@/plugins/updater';
+import type DatabaseShape from '@/types/models/Database';
 import { logger } from '@/utils/logger';
 import { PostgresDialect, sql } from 'kysely';
-import { type Database as DatabaseOrm } from 'kysely-orm';
+import { type Database as DatabaseOrm, type Model, updatedAt } from 'kysely-orm';
 import { Pool } from 'pg';
 
 class dbConnection {
   private static instance: dbConnection;
-  private db: DatabaseOrm<Database.DB>;
+  private db: DatabaseOrm<DatabaseShape>;
   private alreadyConnected = false;
 
   constructor() {
-    this.db = new AppDatabase<Database.DB>({
+    this.db = new AppDatabase<DatabaseShape>({
       dialect: new PostgresDialect({
         pool: async () => new Pool(dbConfig),
       }),
@@ -34,11 +34,13 @@ class dbConnection {
     return this.db.db;
   }
 
-  public BaseModel<TableName extends keyof Database.DB & string, IdColumn extends keyof Database.DB[TableName] & string>(
+  public BaseModel<TableName extends keyof DatabaseShape & string, IdColumn extends keyof DatabaseShape[TableName] & string>(
     tableName: TableName,
     idColumn: IdColumn,
   ) {
-    return this.db.model(tableName, idColumn);
+    const Base = this.db.model(tableName, idColumn);
+    const typedBase = Base as unknown as Model<DatabaseShape, TableName, IdColumn>;
+    return updatedAt<DatabaseShape, TableName, IdColumn, typeof typedBase>(typedBase, 'updated_at') as typeof Base;
   }
 
   public static getInstance(): dbConnection {

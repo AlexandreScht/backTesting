@@ -2,7 +2,7 @@ import { CamelCasePlugin, DummyDriver, PostgresAdapter, PostgresDriver, Postgres
 import { defineConfig, getKnexTimestampPrefix } from 'kysely-ctl';
 import { Pool } from 'pg';
 import dbConfig from './src/config/db.ts';
-import unaccentPlugin from './src/utils/unaccent.ts';
+import unaccentPlugin from './src/plugins/unaccent.ts';
 
 export default defineConfig({
   dialect: {

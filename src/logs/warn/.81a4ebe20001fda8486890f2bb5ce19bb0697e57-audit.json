@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": false,
+        "amount": 90
+    },
+    "auditLog": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\warn\\.81a4ebe20001fda8486890f2bb5ce19bb0697e57-audit.json",
+    "files": [
+        {
+            "date": 1745520261243,
+            "name": "C:\\Users\\alexa\\CodeVStudio\\backTesting\\server\\src\\logs\\warn\\2025-04-24.log",
+            "hash": "428c86020e38e356cb12ef06eb4cd5f9ce62c04479131608dea32abafb55f619"
+        }
+    ],
+    "hashType": "sha256"
+}
