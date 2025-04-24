@@ -1,21 +1,21 @@
 import dbConfig from '@/config/db';
-import type DatabaseShape from '@/types/models/Database';
+import { type Database } from '@/interfaces/database';
+import { AppDatabase } from '@/plugins/updater';
 import { logger } from '@/utils/logger';
 import { PostgresDialect, sql } from 'kysely';
-import { Database as DatabaseOrm } from 'kysely-orm';
+import { type Database as DatabaseOrm } from 'kysely-orm';
 import { Pool } from 'pg';
 
 class dbConnection {
   private static instance: dbConnection;
-  private db: DatabaseOrm<DatabaseShape>;
+  private db: DatabaseOrm<Database.DB>;
   private alreadyConnected = false;
 
   constructor() {
-    this.db = new DatabaseOrm<DatabaseShape>({
+    this.db = new AppDatabase<Database.DB>({
       dialect: new PostgresDialect({
         pool: async () => new Pool(dbConfig),
       }),
-      log: event => event.level === 'error' && console.debug(event.error),
     });
   }
 
@@ -34,7 +34,7 @@ class dbConnection {
     return this.db.db;
   }
 
-  public BaseModel<TableName extends keyof DatabaseShape & string, IdColumn extends keyof DatabaseShape[TableName] & string>(
+  public BaseModel<TableName extends keyof Database.DB & string, IdColumn extends keyof Database.DB[TableName] & string>(
     tableName: TableName,
     idColumn: IdColumn,
   ) {
