@@ -1,6 +1,7 @@
 import { InvalidCredentialsError, ServicesError } from '@/exceptions';
 import type UsersModel from '@/models/users';
 import type Database from '@/types/models/Database';
+import type UsersTable from '@/types/models/public/Users';
 import { logger } from '@/utils/logger';
 import { genSalt, hash } from 'bcryptjs';
 import { type Transaction } from 'kysely';
@@ -41,10 +42,9 @@ export default class AuthServiceFile {
     }
   }
 
-  public async login(user: UsersModel, password: string): Promise<boolean> {
-    if (await user.checkPassword(password)) {
-      return true;
-    }
-    throw new InvalidCredentialsError('Email ou mot de passe incorrect !');
+  public async login(user: UsersModel, password: string): Promise<Pick<UsersTable, 'id' | 'role' | 'validate' | 'firstName'>> {
+    const credentials = await user.checkPassword(password);
+    if (!credentials) throw new InvalidCredentialsError('Email ou mot de passe incorrect !');
+    return credentials;
   }
 }

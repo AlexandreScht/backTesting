@@ -33,6 +33,7 @@ declare namespace authControllerType {
 
   type validAccount = Controller.methodsHandler<{
     params: { accessToken: string };
+    cookie: { new_register: Token.cookieIdentifier };
   }>;
 
   type oAuth = Controller.methodsHandler<{

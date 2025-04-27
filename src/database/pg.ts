@@ -1,5 +1,5 @@
 import dbConfig from '@/config/db';
-import { AppDatabase } from '@/plugins/updater';
+import { AppDatabase } from '@/plugins';
 import type DatabaseShape from '@/types/models/Database';
 import { logger } from '@/utils/logger';
 import { PostgresDialect, sql } from 'kysely';

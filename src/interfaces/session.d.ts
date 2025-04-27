@@ -1,11 +1,10 @@
+import type UserRole from '@/types/models/public/UserRole';
+
 export namespace Session {
   export type JWT<T> = string & { __jwtPayloadBrand?: T };
-
-  export type role = 'normal' | 'premium' | 'admin';
-
   export interface userPayload {
     sessionId: number;
-    sessionRole: role;
+    sessionRole: UserRole;
     refreshToken: string;
   }
 }
