@@ -20,7 +20,7 @@ declare namespace authControllerType {
   }>;
 
   type resetPassword = Controller.methodsHandler<{
-    cookie: { reset_access: Token.cookieIdentifier };
+    cookie: { new_password: Token.cookieIdentifier };
     body: {
       password: string;
     };

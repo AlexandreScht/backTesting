@@ -66,4 +66,23 @@ export default class MailerServiceFile {
       throw new ServicesError();
     }
   }
+  async new_password(email: string, token: string) {
+    try {
+      const confirmationEmail = fs.readFileSync(join(this.template_dir, 'new_password.html'), { encoding: 'utf-8' });
+      const htmlMailer = confirmationEmail
+        .replace('{{support_MAIL}}', this.support_mail)
+        .replace('{{link}}', `${env.ORIGIN}/password/reset/${encodeURI(token)}`);
+
+      const mailOptions = {
+        to: email,
+        subject: 'Demande de nouveau mot de passe',
+        html: htmlMailer,
+      };
+
+      await this.sendMailAsync(mailOptions);
+    } catch (error) {
+      logger.error('MailerService.Registration => ', error);
+      throw new ServicesError();
+    }
+  }
 }

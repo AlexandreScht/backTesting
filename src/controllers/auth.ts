@@ -1,6 +1,6 @@
 import env from '@/config';
 import { user_tester } from '@/config/list';
-import { InvalidArgumentError, InvalidCredentialsError, InvalidSessionError, ServerException } from '@/exceptions';
+import { InvalidArgumentError, InvalidCredentialsError, InvalidSessionError, NotFoundError, ServerException } from '@/exceptions';
 import { type Session } from '@/interfaces/session';
 import { type Token } from '@/interfaces/token';
 import ApiServiceFile from '@/services/api';
@@ -50,7 +50,7 @@ export default class AuthControllerFile extends ControllerClass {
         }
         await this.MailerService.new_register(email, accessToken);
         createSessionCookie<Token.cookieIdentifier>(res, { id, cookieName: 'new_register' }, '15m');
-        res.status(200).send('Please check your email to activate your account.');
+        res.status(204).send('Please check your email to activate your account.');
         return;
       }
 
@@ -63,7 +63,7 @@ export default class AuthControllerFile extends ControllerClass {
           createSessionCookie<Token.cookieIdentifier>(res, { id, cookieName: 'new_register' }, '15m');
         },
       );
-      res.status(200).send('Please check your email to activate your account.');
+      res.status(204).send('Please check your email to activate your account.');
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('AuthControllerFile.register => ', error);
@@ -133,6 +133,77 @@ export default class AuthControllerFile extends ControllerClass {
 
       createSessionCookie<Session.userPayload>(res, { refreshToken: uuid(), sessionId: id, sessionRole: role, cookieName: env.COOKIE_NAME }, '31d');
       res.status(200).send({ firstName, role });
+    } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.validateAccount => ', error);
+      }
+      next(error);
+    }
+  }
+
+  protected async askResetPassword({
+    locals: {
+      params: { email },
+    },
+    res,
+    next,
+  }: authControllerType.askResetPassword) {
+    try {
+      if (!email) throw new NotFoundError('Please enter your email address to receive the link.');
+
+      const user = await this.UserService.getUser({ email, isoAuth: false }, ['id', 'validate', 'accessToken']);
+
+      if (!user) {
+        res.status(204).send("We've sent you an email with instructions to reset your password.");
+        return;
+      }
+
+      const { validate, id, accessToken } = user;
+
+      if (!validate) {
+        await this.MailerService.new_register(email, accessToken);
+        createSessionCookie<Token.cookieIdentifier>(res, { id, cookieName: 'new_register' }, '15m');
+        res.status(204).send("We've sent you an email with instructions to reset your password.");
+        return;
+      }
+
+      const { accessToken: newAccessToken } = (await this.UserService.updateUsers({ id, email }, { accessToken: uuid() }, ['accessToken'])) || {};
+      await this.MailerService.new_password(email, newAccessToken);
+      createSessionCookie<Token.cookieIdentifier>(res, { id, cookieName: 'new_password' }, '15m');
+
+      res.status(204).send("We've sent you an email with instructions to reset your password.");
+    } catch (error) {
+      if (!(error instanceof ServerException)) {
+        logger.error('AuthControllerFile.validateAccount => ', error);
+      }
+      next(error);
+    }
+  }
+
+  protected async resetPassword({
+    locals: {
+      cookie: { new_password },
+      body: { password },
+      token: accessToken,
+    },
+    res,
+    next,
+  }: authControllerType.resetPassword) {
+    try {
+      if (!new_password || new_password?.expired || !new_password?.id)
+        throw new InvalidArgumentError('This link has expired. Please request a new one to continue.');
+      if (!password) throw new InvalidArgumentError('A password is required.');
+      const { id } = new_password;
+      const success = await this.UserService.updateUsers({ id, accessToken, password: { not: null } }, { password });
+
+      if (!success) throw new InvalidArgumentError('Sorry, something went wrong. If the issue persists, please contact support for assistance');
+      res.clearCookie('new_password', {
+        signed: true,
+        httpOnly: true,
+        domain: new URL(env.ORIGIN).hostname,
+        secure: env.ORIGIN.startsWith('https'),
+      });
+      res.status(204).send('Your password has been successfully changed.');
     } catch (error) {
       if (!(error instanceof ServerException)) {
         logger.error('AuthControllerFile.validateAccount => ', error);
